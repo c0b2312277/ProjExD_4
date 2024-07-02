@@ -8,6 +8,8 @@ import pygame as pg
 
 WIDTH = 1100  # ゲームウィンドウの幅
 HEIGHT = 650  # ゲームウィンドウの高さ
+#追加6
+BEAMS_NUM = 5  # 弾幕の数
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -141,14 +143,14 @@ class Beam(pg.sprite.Sprite):
     """
     ビームに関するクラス
     """
-    def __init__(self, bird: Bird):
+    def __init__(self, bird: Bird, angle0=0):  # 追加6
         """
         ビーム画像Surfaceを生成する
         引数 bird：ビームを放つこうかとん
         """
         super().__init__()
         self.vx, self.vy = bird.dire
-        angle = math.degrees(math.atan2(-self.vy, self.vx))
+        angle = math.degrees(math.atan2(-self.vy, self.vx)) + angle0  # 追加6
         self.image = pg.transform.rotozoom(pg.image.load(f"fig/beam.png"), angle, 2.0)
         self.vx = math.cos(math.radians(angle))
         self.vy = -math.sin(math.radians(angle))
@@ -242,6 +244,20 @@ class Score:
         screen.blit(self.image, self.rect)
 
 
+#追加6
+class NeoBeam:
+    """
+    弾幕に関するクラス
+    """
+    def __init__(self, bird: Bird, num: int):
+        self.num = num
+        self.bird = bird
+
+    def gen_beams(self):
+        beams = [Beam(self.bird, angle) for angle in range(-50, 51, 100//(self.num-1))]
+        return beams
+
+
 def main():
     pg.display.set_caption("真！こうかとん無双")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -253,6 +269,8 @@ def main():
     beams = pg.sprite.Group()
     exps = pg.sprite.Group()
     emys = pg.sprite.Group()
+    #追加6
+    neobeams = NeoBeam(bird, BEAMS_NUM)
 
     tmr = 0
     clock = pg.time.Clock()
@@ -263,6 +281,10 @@ def main():
                 return 0
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                 beams.add(Beam(bird))
+            # 追加6
+            if event.type == pg.KEYDOWN and key_lst[pg.K_LSHIFT] and event.key == pg.K_SPACE:
+                beams.add(neobeams.gen_beams())
+
         screen.blit(bg_img, [0, 0])
 
         if tmr%200 == 0:  # 200フレームに1回，敵機を出現させる
