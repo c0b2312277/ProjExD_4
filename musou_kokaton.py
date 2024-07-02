@@ -292,17 +292,21 @@ def main():
             exps.add(Explosion(bomb, 50))  # 爆発エフェクト
             score.value += 1  # 1点アップ
 
-        if len(pg.sprite.spritecollide(bird, bombs, True)) != 0:
-            if bird.state == "normal":
+        if bird.state == "normal":
+            if len(pg.sprite.spritecollide(bird, bombs, True)) != 0 :
                 bird.change_img(8, screen) # こうかとん悲しみエフェクト
                 score.update(screen)
                 pg.display.update()
                 time.sleep(2)
                 return
-
         if len(pg.sprite.spritecollide(bird, emys, True)) != 0 and bird.state != "normal":  #無敵の時の撃墜処理
             exps.add(Explosion(emy, 100))  # 爆発エフェクト
-            score.value += 1  # 1点アップ
+            score.value += 50  # 50点アップ
+        for bomb in bombs:
+            if pg.sprite.spritecollide(bird, bombs, True) and bird.state != "normal":
+                exps.add(Explosion(bomb, 50)) # 爆弾処理
+                score.value += 1  # 1点アップ
+
 
         bird.update(key_lst, screen)
         beams.update()
@@ -317,6 +321,7 @@ def main():
         pg.display.update()
         tmr += 1
         clock.tick(50)
+        # print(bird.state)
 
 
 if __name__ == "__main__":
