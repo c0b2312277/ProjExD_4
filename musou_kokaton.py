@@ -5,6 +5,7 @@ import sys
 import time
 import pygame as pg
 
+
 WIDTH = 1100  # ゲームウィンドウの幅
 HEIGHT = 650  # ゲームウィンドウの高さ
 #追加6
@@ -115,6 +116,7 @@ class Bomb(pg.sprite.Sprite):
     爆弾に関するクラス
     """
     colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0), (255, 0, 255), (0, 255, 255)]
+
     def __init__(self, emy: "Enemy", bird: Bird):
         """
         爆弾円Surfaceを生成する
@@ -413,6 +415,16 @@ def main():
             exps.add(Explosion(bomb, 50))  # 爆発エフェクト
             score.value += 1  # 1点アップ
 
+        # 追加2
+        for emy in pg.sprite.groupcollide(emys, gravitys, True, False).keys():
+            exps.add(Explosion(emy, 100))
+            score.value += 1
+
+        # 追加2
+        for bomb in pg.sprite.groupcollide(bombs, gravitys, True, False).keys():
+            exps.add(Explosion(bomb, 50))
+            score.value += 1
+
         # 防御壁と爆弾の衝突判定
         for shield in pg.sprite.groupcollide(shields, bombs, False, True).keys():
             exps.add(Explosion(shield, 50))  # 爆発エフェクト
@@ -420,15 +432,15 @@ def main():
         if bird.state == "normal":
     
         # if len(pg.sprite.spritecollide(bird, bombs, True)) != 0 :
-         for bomb in pg.sprite.spritecollide(bird,bombs,True):
-            if bomb.state == "inactivate":
-                pass
-            else:
-                bird.change_img(8, screen)  # こうかとん悲しみエフェクト
-                score.update(screen)
-                pg.display.update()
-                time.sleep(2)
-                return
+            for bomb in pg.sprite.spritecollide(bird,bombs,True):
+                if bomb.state == "inactivate":
+                    pass
+                else:
+                    bird.change_img(8, screen)  # こうかとん悲しみエフェクト
+                    score.update(screen)
+                    pg.display.update()
+                    time.sleep(2)
+                    return
         if len(pg.sprite.spritecollide(bird, emys, True)) != 0 and bird.state != "normal":  #無敵の時の撃墜処理
             exps.add(Explosion(emy, 100))  # 爆発エフェクト
             score.value += 50  # 50点アップ
